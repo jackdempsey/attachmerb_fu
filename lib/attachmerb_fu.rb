@@ -48,7 +48,7 @@ module AttachmerbFu # :nodoc:
     #   has_attachment :storage => :file_system, :path_prefix => 'public/files',
     #     :thumbnails => { :thumb => [50, 50], :geometry => 'x50' }
     #   has_attachment :storage => :s3
-    def has_attachment(options = {})      
+    def has_attachment(options = {})
       # this allows you to redefine the acts' options for each subclass, however
       options[:min_size]         ||= 1
       options[:max_size]         ||= 1024*1024*1024
