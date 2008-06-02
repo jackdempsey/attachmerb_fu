@@ -100,6 +100,9 @@ module AttachmerbFu # :nodoc:
             processors = AttachmerbFu.default_processors.dup
             begin
               if processors.any?
+                # commenting out til i can look into issue with classify
+                #attachment_options[:processor] = "#{processors.first}Processor"
+                #require "attachmerb_fu/processors/#{attachment_options[:processor].snake_case}"
                 attachment_options[:processor] = "RmagickProcessor"
                 require "attachmerb_fu/processors/rmagick_processor"
                 
@@ -111,6 +114,9 @@ module AttachmerbFu # :nodoc:
             end
           else
             begin
+              # commenting out til i can look into issue with classify
+              #processor = "#{options[:processor].to_s.classify}Processor"
+              #require "attachmerb_fu/processors/#{processor.snake_case}"
               processor = "RmagickProcessor"
               require "attachmerb_fu/processors/rmagick_processor"
               include AttachmerbFu::Processors.const_get(processor)
