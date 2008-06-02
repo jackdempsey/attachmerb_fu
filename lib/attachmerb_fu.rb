@@ -1,5 +1,11 @@
 require "geometry"
 require "tempfile_ext"
+require 'rubygems' 
+gem "merb-core"
+gem "dm-core" 
+gem "dm-more"
+require 'data_mapper'
+require 'dm-validations'
 
 module AttachmerbFu # :nodoc:
   @@default_processors = %w(ImageScience Rmagick MiniMagick)
@@ -42,7 +48,7 @@ module AttachmerbFu # :nodoc:
     #   has_attachment :storage => :file_system, :path_prefix => 'public/files',
     #     :thumbnails => { :thumb => [50, 50], :geometry => 'x50' }
     #   has_attachment :storage => :s3
-    def has_attachment(options = {})
+    def has_attachment(options = {})      
       # this allows you to redefine the acts' options for each subclass, however
       options[:min_size]         ||= 1
       options[:max_size]         ||= 1024*1024*1024
@@ -67,25 +73,26 @@ module AttachmerbFu # :nodoc:
         attachment_options[:storage]     ||= :file_system
         attachment_options[:path_prefix] ||= attachment_options[:file_system_path]
         if attachment_options[:path_prefix].nil?
-          attachment_options[:path_prefix] = File.join("public", table.name)
+          attachment_options[:path_prefix] = File.join("public", storage_name)
         end
         attachment_options[:path_prefix]   = attachment_options[:path_prefix][1..-1] if options[:path_prefix][0] == '/'
 
-        has_many   :thumbnails, :class_name => attachment_options[:thumbnail_class].to_s, :foreign_key => 'parent_id'
-        belongs_to :parent, :class_name => table.klass.to_s, :foreign_key => 'parent_id'
+        one_to_many   :thumbnails, :class_name => attachment_options[:thumbnail_class].to_s, :child_key => ['parent_id']
+        belongs_to :parent, :class_name => storage_name, :child_key => ['parent_id']
 
-        before_update :rename_file
-        before_destroy :destroy_thumbnails
+        backend = "FileSystemBackend"
+        require "attachmerb_fu/backends/file_system_backend"
+        include AttachmerbFu::Backends.const_get(backend)
 
-        before_validation :set_size_from_temp_path
-        after_save :after_process_attachment
-        after_destroy :destroy_file
+        before :update, :rename_file
+        before :destroy, :destroy_thumbnails
+
+        before :save, :set_size_from_temp_path
+        before :save, :process_attachment
+        after :save, :after_process_attachment
+        after :destroy, :destroy_file
         extend  ClassMethods
         include InstanceMethods
-        
-        backend = "#{options[:storage].to_s.classify}Backend"
-        require "attachmerb_fu/backends/#{backend.snake_case}"
-        include AttachmerbFu::Backends.const_get(backend)
 
         case attachment_options[:processor]
           when :none
@@ -93,8 +100,8 @@ module AttachmerbFu # :nodoc:
             processors = AttachmerbFu.default_processors.dup
             begin
               if processors.any?
-                attachment_options[:processor] = "#{processors.first}Processor"
-                require "attachmerb_fu/processors/#{attachment_options[:processor].snake_case}"
+                attachment_options[:processor] = "RmagickProcessor"
+                require "attachmerb_fu/processors/rmagick_processor"
                 
                 include AttachmerbFu::Processors.const_get(attachment_options[:processor])
               end
@@ -104,15 +111,15 @@ module AttachmerbFu # :nodoc:
             end
           else
             begin
-              processor = "#{options[:processor].to_s.classify}Processor"
-              require "attachmerb_fu/processors/#{processor.snake_case}"
+              processor = "RmagickProcessor"
+              require "attachmerb_fu/processors/rmagick_processor"
               include AttachmerbFu::Processors.const_get(processor)
             rescue LoadError
               puts "Problems loading #{processor}: #{$!}"
             end
         end
         
-        after_validation :process_attachment
+        # after :save, :process_attachment
       end
     end
   end
@@ -234,7 +241,7 @@ module AttachmerbFu # :nodoc:
           :thumbnail_resize_options => size
         }
         callback_with_args :before_thumbnail_saved, thumb
-        thumb.save!
+        thumb.save
       end
     end
 
@@ -273,7 +280,6 @@ module AttachmerbFu # :nodoc:
     #
     # TODO: Allow it to work with Merb tempfiles too.
     def uploaded_data=(file_data)
-
       return nil if file_data.nil? || file_data["size"] == 0 
       self.content_type = file_data["content_type"]
       self.filename     = file_data["filename"] if respond_to?(:filename)
@@ -441,6 +447,6 @@ if defined?(Merb::Plugins)
   
   #Merb::Plugins.add_rakefiles "attachmerb_fu/merbtasks"
   
-  DataMapper::Base.send(:extend, AttachmerbFu::ActMethods)
+  DataMapper::Resource.send(:extend, AttachmerbFu::ActMethods)
   
 end

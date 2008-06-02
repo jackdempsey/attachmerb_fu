@@ -4,7 +4,7 @@ module AttachmerbFu # :nodoc:
     # Methods for file system backed attachments
     module FileSystemBackend
       def self.included(base) #:nodoc:
-        base.before_update :rename_file
+        base.before :update, :rename_file
       end
     
       # Gets the full path to the filename in this format:
