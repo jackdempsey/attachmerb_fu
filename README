@@ -7,16 +7,24 @@ This plugin is still in a very alpha state and was only tested with Datamapper O
 
 ** This fork has been modified to work with ActiveRecord 2.1+ but not Datamapper
 
-Note: attachmerb_fu requires Merb >= 0.5
+Note: attachmerb_fu requires Merb >= 0.9.3
 
 To use this:
 
 Unpack into lib/attachmerb_fu
 
-Then add:
+Then add to your config/init.rb:
 
-require Merb.root / 'lib/attachmerb_fu/datamapper-bindings'
-require Merb.root / 'lib/attachmerb_fu/activerecord_bindings' 
+Merb::BootLoader.after_app_loads do
+  require Merb.root / 'lib/attachmerb_fu/datamapper-bindings'
+end
+
+or
+
+Merb::BootLoader.after_app_loads do
+   require Merb.root / 'lib/attachmerb_fu/activerecord_bindings' 
+end
+
 
 In the future, this should be automatically detected.
 
