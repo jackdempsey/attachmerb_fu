@@ -3,7 +3,9 @@ attachmerb-fu
 
 attachmerb_fu is a port of Rick Olson's famous attachment_fu Rails plugin to merb. It tries to be as orm-agnostic as merb while having the same functionalities as the original plugin.
 
-This plugin is still in a very alpha state and was only tested with datamapper orm, mini_magick image processor and filesystem storage. It may or may not work for your application
+This plugin is still in a very alpha state and was only tested with Datamapper ORM, mini_magick image processor and filesystem storage. It may or may not work for your application
+
+** This fork has been modified to work with ActiveRecord 2.1+ but not Datamapper
 
 Note: attachmerb_fu requires Merb >= 0.5
 
