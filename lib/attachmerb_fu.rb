@@ -1,5 +1,5 @@
-require "geometry"
-require "tempfile_ext"
+require File.join(File.dirname(__FILE__), "geometry")
+require File.join(File.dirname(__FILE__), "tempfile_ext")
 
 module AttachmerbFu # :nodoc:
   @@default_processors = %w(ImageScience Rmagick MiniMagick)

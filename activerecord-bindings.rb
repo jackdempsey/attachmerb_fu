@@ -1,4 +1,4 @@
-require "attachmerb_fu"
+require File.join(File.dirname(__FILE__), 'lib', "attachmerb_fu")
 #require "geometry"
 #require "tempfile_ext"
 
