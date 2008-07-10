@@ -10,7 +10,6 @@ if defined?(Merb::Plugins)
   }
   
   #Merb::Plugins.add_rakefiles "attachmerb_fu/merbtasks"
-  
-  DataMapper::Base.send(:extend, AttachmerbFu::ActMethods)
+  DataMapper::Associations.send(:include, AttachmerbFu::ActMethods)
   
 end
