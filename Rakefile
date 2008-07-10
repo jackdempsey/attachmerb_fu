@@ -4,9 +4,12 @@ require 'rake/gempackagetask'
 PLUGIN = "attachmerb_fu"
 NAME = "attachmerb_fu"
 VERSION = "0.0.1"
-AUTHOR = "Michael Siebert"
-EMAIL = "siebertm85@googlemail.com"
-HOMEPAGE = "http://merb-plugins.rubyforge.org/attachmerb_fu/"
+#AUTHOR = "Michael Siebert"
+#EMAIL = "siebertm85@googlemail.com"
+AUTHOR = "Jack Dempsey"
+EMAIL = "jack.dempsey@gmail.com" # Michael was the original convertor but has moved on to other things
+                                 # so feel free to contact me instead with questions, etc
+HOMEPAGE = "http://github.com/jackdempsey/attachmerb_fu/tree/master"
 SUMMARY = "Merb plugin that provides a port of attachment_fu to merb"
 
 spec = Gem::Specification.new do |s|
@@ -20,7 +23,7 @@ spec = Gem::Specification.new do |s|
   s.author = AUTHOR
   s.email = EMAIL
   s.homepage = HOMEPAGE
-  s.add_dependency('merb', '>= 0.5.0')
+  s.add_dependency('merb', '>= 0.9.3')
   s.require_path = 'lib'
   s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs}/**/*")
